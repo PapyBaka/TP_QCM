@@ -22,12 +22,13 @@ if (isset($_POST["email"]) && isset($_POST["mdp"]) && isset($_POST["prenom"]) &&
             $requete = 'INSERT INTO personnes (prenom, nom, mail, mot_de_passe) VALUES (:prenom, :nom, :mail, :motdepasse)';
             $query = $pdo->prepare($requete);
             $query->execute([
-                "prenom" => $_POST["prenom"],
-                "nom" => $_POST["nom"],
+                "prenom" => ucfirst($_POST["prenom"]),
+                "nom" => ucfirst($_POST["nom"]),
                 "mail" => $_POST["email"],
                 "motdepasse" => password_hash($_POST["mdp"],PASSWORD_DEFAULT)
             ]);
-            $succes = "Inscription réussie";
+            $succes = "Inscription réussie. Vous serez redirigé vers la page de connexion dans 5 secondes. Si ce n'est pas le cas, <a href='connexion.php'>cliquez ici";
+            header("refresh:5;url=connexion.php"); 
         } catch (Exception $e) {
             $error["pdo"] = $e->getMessage();
         }

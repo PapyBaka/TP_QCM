@@ -9,16 +9,20 @@ if (isset($_POST["email"]) && isset($_POST["mdp"])) {
     if (empty($error)) {
         try {
             $pdo = new PDO("mysql:host=localhost;dbname=qcm","root","");
-            $requete = $pdo->prepare("SELECT mot_de_passe FROM personnes WHERE mail = :email");
+            $requete = $pdo->prepare("SELECT mot_de_passe,prenom,statut,id FROM personnes WHERE mail = :email");
             $requete->execute([
                 "email" => $_POST["email"]
             ]);
-            $donnees = $requete->fetch(PDO::FETCH_ASSOC);
-            if (password_verify($_POST["mdp"],$donnees["mot_de_passe"])) {
+            $fetch = $requete->fetch(PDO::FETCH_ASSOC);
+            if (password_verify($_POST["mdp"],$fetch["mot_de_passe"])) {
                 $succes = "Connexion réussie";
+                $_SESSION["prenom"] = $fetch["prenom"];
+                $_SESSION["statut"] = $fetch["statut"];
+                $_SESSION["id"] = $fetch["id"];
+                header("Location:index.php");
             }
             else {
-                throw new Exception("Combinaison mail/mdp inexistante");
+                throw new Exception("Combinaison mail/mdp inexistante (fdp)");
             }
         } catch (Exception $e) {
             $error["exception"] = $e->getMessage();
