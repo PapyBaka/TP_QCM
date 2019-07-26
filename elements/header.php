@@ -19,7 +19,7 @@ require "functions.php";
         <a class="navbar-brand" href="index.php"><h2>Super QCM</h2></a>
         <?php if (est_connecte() && $_SESSION["statut"] == "admin"): ?>
         <div class="navbar-nav my-2">
-            <a class="nav-item nav-link" href="#"><strong>Administration</strong></a>
+            <a class="nav-item nav-link" href="admin.php"><strong>Administration</strong></a>
         </div>
         <?php endif; ?>
     </div>
