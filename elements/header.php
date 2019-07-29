@@ -1,6 +1,11 @@
 <?php
 session_start();
 require "functions.php";
+if (!est_connecte() || $_SESSION["statut"] !== "admin") {
+    if ($_SERVER["SCRIPT_NAME"] === "/TP_QCM/admin.php") {
+        header("Location:index.php");
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

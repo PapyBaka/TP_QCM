@@ -16,7 +16,7 @@ function select_themes() {
     return $themes;
 }
 
-function select_questions($name, $theme_id) {
+function select_questions($theme_id) {
     $pdo = new PDO("mysql:host=localhost;dbname=qcm","root","");
     $requete = $pdo->prepare("SELECT id,contenu FROM questions WHERE id_theme = :id_theme");
     $requete->execute([
