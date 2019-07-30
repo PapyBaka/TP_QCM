@@ -12,7 +12,20 @@ require "elements/header.php";
       <div class="card-header text-center text-white" style="background-color:#218ed6">
         <h3>Jouer</h3>
       </div>
-      <div class="card-body">Statut: <?= $_SESSION["statut"] ?></div>
+      <div class="card-body">
+        <form method="POST" action="jeu.php">
+          <div class="form-group">
+            <label for="theme">Choix du thème</label>
+            <?php $themes = select_themes() ?>
+            <select class="form-control" name="theme" id="theme">
+              <?php foreach($themes as $theme): ?>
+                <option value="<?= $theme->id ?>"><?= $theme->nom ?></option>
+              <?php endforeach ?>
+            </select>
+          </div>
+          <button class="btn btn-primary" type="submit" name="0">C'est parti !</button>
+        </form>
+      </div>
     </div>
 
     <div class="card col p-0 m-2">

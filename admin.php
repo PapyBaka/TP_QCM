@@ -3,15 +3,40 @@ require "elements/header.php";
 $error = null;
 $success = null;
 echo "<pre>";
-var_dump($_SERVER);
+var_dump($_POST);
 echo "</pre>";
     // VERIF DONNEES POST
 if (isset($_POST)) {
   try {
     $pdo = new PDO("mysql:host=localhost;dbname=qcm;charset=utf8","root","");
 
-    // AJOUT THEME
     if (isset($_POST["form_ajout_theme"])) {
+      if (ajout_theme($_POST["ajout_theme"],$pdo)) {
+        $success = "Thème ajouté avec succès !";
+      }
+    }
+
+    if (isset($_POST["form_ajout_question"])) {
+      if (!isset($_POST["choix_theme"])) {
+        throw new Exception("Un thème doit être choisi");
+      }
+      if (ajout_question($_POST["ajout_question"],$_POST["choix_theme"],$_POST["ajout_reponse"],$pdo)) {
+        $success = "Question/réponses ajoutées avec succès !";
+      }
+    }
+
+    if (isset($_POST["form_ajout_rep_supp"])) {
+      if (!isset($_POST["choix_question"])) {
+        throw new Exception ("La réponse doit être liée à une question");
+      }
+      $bonne_rep = isset($_POST["bonne_rep_supp"]) ? $_POST["bonne_rep_supp"] : "0";
+      if (ajout_rep_supp($_POST["choix_question"],$_POST["ajout_rep_supp"],$bonne_rep,$pdo)) {
+        $success = "Réponse ajoutée avec succès !";
+      }
+    }
+
+    // AJOUT THEME
+    /* if (isset($_POST["form_ajout_theme"])) {
       if (!empty(trim($_POST["ajout_theme"]))) {
         $requete = $pdo->prepare("SELECT nom FROM themes WHERE nom = :nom");
         $requete->execute([
@@ -30,10 +55,10 @@ if (isset($_POST)) {
       } else {
         $error = "Le thème doit avoir un nom mdr";
       }
-    }
+    } */
 
     //VERSION GESTION D'EXCEPTION
-    if (empty(trim($_POST["ajout_theme"]))) {
+    /* if (empty(trim($_POST["ajout_theme"]))) {
       throw new Exception("Le thème doit avoir un nom");
     }
     $requete = $pdo->prepare("SELECT nom FROM themes WHERE nom = :nom");
@@ -48,12 +73,11 @@ if (isset($_POST)) {
       "nom" => strtoupper(trim(htmlentities($_POST["ajout_theme"]))),
       "id_auteur" => $_SESSION["id"]
     ]);
-    $success = "Thème ajouté avec succès !"; 
+    $success = "Thème ajouté avec succès !";  */
 
     // AJOUT QUESTION/REP
-    if (isset($_POST["form_ajout_question"])) {
+    /* if (isset($_POST["form_ajout_question"])) {
       if (isset($_POST["choix_theme"]) && !empty(trim($_POST["ajout_question"]))) {
-
         //QUESTION
         $requete = $pdo->prepare("SELECT contenu FROM questions WHERE contenu = :contenu");
         $requete->execute([
@@ -108,10 +132,10 @@ if (isset($_POST)) {
       else {
         $error = "Votre question doit avoir un thème et un contenu";
       }
-    }
+    } */
 
     //AJOUT REPONSE SUPPLEMENTAIRE
-    if (isset($_POST["form_ajout_rep_supp"])) {
+    /* if (isset($_POST["form_ajout_rep_supp"])) {
       if (isset($_POST["choix_question"]) && !empty(trim($_POST["ajout_rep_supp"]))) {
         $requete = $pdo->prepare("INSERT INTO reponses (contenu,id_question,vrai_rep) VALUES (:contenu, :id_question, :bonne_rep)");
         $requete->execute([
@@ -123,7 +147,7 @@ if (isset($_POST)) {
         $error = "Votre réponse doit posséder un contenu et être liée à une question";
       }
       $success = "Réponse ajoutée avec succès !";
-    }
+    } */
     
   } catch (Exception $e) {
     $error = $e->getMessage();
@@ -157,7 +181,7 @@ if (isset($_POST)) {
             <form action="" method="POST">
                 <div class="form-group">
                     <label for="ajout_theme"><h4>Ajouter un thème</h4></label>
-                    <input type="text" class="form-control" id="ajout_theme" name="ajout_theme" placeholder="Nom du thème">
+                    <input type="text" class="form-control <?= isset($error_theme) ? 'is-invalid' : '' ?>" id="ajout_theme" name="ajout_theme" placeholder="Nom du thème">
                 </div>
                 <button type="submit" name="form_ajout_theme" class="btn btn-primary">Ajouter</button>
             </form>
@@ -171,7 +195,7 @@ if (isset($_POST)) {
                     <label for="choix_theme"><h4>Ajouter une question</h4></label>
                       <select class="form-control" name="choix_theme" id="choix_theme">
                         <option selected disabled>Choix du thème</option>
-                        <?php $themes = select_themes("choix_theme"); ?>
+                        <?php $themes = select_themes("choix_theme",$pdo); ?>
                         <?php foreach($themes as $theme): ?>
                         <option value="<?= $theme->id ?>"><?= $theme->nom ?></option>
                         <?php endforeach ?>
@@ -243,7 +267,7 @@ if (isset($_POST)) {
                   <div class="input-group">
                     <div class="input-group-prepend">
                       <div class="input-group-text">
-                        <input type="radio" name="bonne_rep_supp" value="1">
+                        <input type="checkbox" name="bonne_rep_supp" value="1">
                       </div>
                     </div>
                     <input type="text" class="form-control" id="ajout_rep_supp" name="ajout_rep_supp" placeholder="Contenu de la réponse" aria-describedby="help">
