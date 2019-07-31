@@ -1,5 +1,9 @@
 <?php
 
+function array_key_last(array $array){
+    return (!empty($array)) ? array_keys($array)[count($array)-1] : null;
+}
+
 function est_connecte() {
     if (isset($_SESSION["prenom"]) && isset($_SESSION["statut"]) and isset($_SESSION["id"])) {
         return true;
@@ -28,7 +32,7 @@ function select_questions($theme_id) {
 
 function select_reponses($question_id) {
     $pdo = new PDO("mysql:host=localhost;dbname=qcm;charset=utf8","root","");
-    $requete = $pdo->prepare("SELECT contenu,vrai_rep FROM reponses WHERE id_question = :id_question");
+    $requete = $pdo->prepare("SELECT contenu,vrai_rep,id FROM reponses WHERE id_question = :id_question");
     $requete->execute([
         "id_question" => $question_id
     ]);
