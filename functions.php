@@ -20,6 +20,14 @@ function select_themes() {
     return $themes;
 }
 
+function select_theme($theme_id) {
+    $pdo = new PDO("mysql:host=localhost;dbname=qcm;charset=utf8","root","");
+    $requete = $pdo->prepare("SELECT id,nom FROM themes WHERE id = :id_theme");
+    $requete->execute(["id_theme" => $theme_id]);
+    $themes = $requete->fetch(PDO::FETCH_OBJ);
+    return $themes;
+}
+
 function select_questions($theme_id) {
     $pdo = new PDO("mysql:host=localhost;dbname=qcm;charset=utf8","root","");
     $requete = $pdo->prepare("SELECT id,contenu FROM questions WHERE id_theme = :id_theme");

@@ -2,7 +2,7 @@
 session_start();
 require "functions.php";
 if (!est_connecte() || $_SESSION["statut"] !== "admin") {
-    if ($_SERVER["SCRIPT_NAME"] === "/TP_QCM/admin.php") {
+    if ($_SERVER["SCRIPT_NAME"] === "/TP_QCM/admin.php" || $_SERVER["SCRIPT_NAME"] === "/TP_QCM/jeu.php") {
         header("Location:index.php");
     }
 }
