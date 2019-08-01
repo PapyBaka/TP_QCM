@@ -34,6 +34,58 @@ if (isset($_POST)) {
         $success = "Réponse ajoutée avec succès !";
       }
     }
+
+    if (isset($_POST["form_modif_theme"])) {
+      if (!isset($_POST["choix_modif_theme"])) {
+        throw new Exception("Un thème doit être sélectionné");
+      }
+      if (modif_theme($_POST["choix_modif_theme"],$_POST["nom_modif_theme"],$pdo)) {
+        $success = "Thème modifié avec succès";
+      }
+    }
+
+    if (isset($_POST["form_supp_theme"])) {
+      if (!isset($_POST["choix_modif_theme"])) {
+        throw new Exception("Un thème doit être sélectionné");
+      }
+      $success = "Thème supprimé avec succès";
+    }
+
+    if (isset($_POST["form_modif_question"])) {
+      if (!isset($_POST["choix_modif_question"])) {
+        throw new Exception("Une question doit être sélectionnée");
+      }
+      if (modif_question($_POST["choix_modif_question"],$_POST["nom_modif_question"],$pdo)) {
+        $success = "La question a bien été modifié";
+      }
+    }
+
+    if (isset($_POST["form_supp_question"])) {
+      if (!isset($_POST["choix_modif_question"])) {
+        throw new Exception("Une question doit être sélectionné");
+      }
+      if (supp_question($_POST["choix_modif_question"],$pdo)) {
+        $success = "Question/réponses supprimées avec succès";
+      }
+    }
+
+    if (isset($_POST["form_modif_rep"])) {
+      if (!isset($_POST["choix_modif_rep"])) {
+        throw new Exception("Une réponse doit être sélectionné");
+      }
+      if (modif_reponse($_POST["choix_modif_rep"],$_POST["nom_modif_rep"],$pdo)) {
+        $success = "Réponse modifiée avec succès";
+      }
+    }
+
+    if (isset($_POST["form_supp_rep"])) {
+      if (!isset($_POST["choix_modif_rep"])) {
+        throw new Exception("Une réponse doit être sélectionné");
+      }
+      if (supp_reponse($_POST["choix_modif_rep"],$pdo)) {
+        $success = "Réponse supprimée avec succès";
+      }
+    }
   } catch (Exception $e) {
     $error = $e->getMessage();
   }
@@ -140,13 +192,13 @@ if (isset($_POST)) {
                         <option selected disabled>Choix de la question</option>
                         <?php $themes = select_themes(); ?>
                         <?php foreach($themes as $theme): ?>
-                            <option disabled value="<?=$theme->id?>"><strong><?= $theme->nom ?></strong></option>
+                            <option disabled value="<?=$theme->id?>">---------<?= $theme->nom ?>---------</option>
                             <?php $questions = select_questions($theme->id); ?>
                             <?php foreach ($questions as $question): ?>
                             <option value="<?= $question->id ?>"><?= $question->contenu ?></option>
                             <?php endforeach ?>
                         <?php endforeach ?>
-                      </select>
+                    </select>
                 </div>
                 <div class="form-group">
                   <div class="input-group">
@@ -165,13 +217,94 @@ if (isset($_POST)) {
             </form>
         </div>
     </div>
-
+    <!-- SECTION MODIFICATION -->
     <div class="card col p-0 m-2">
       <div class="card-header text-center text-white" style="background-color:#218ed6">
         <h3>Consultation/modification</h3>
       </div>
       <div class="card-body">
-        Statut: <?= $_SESSION["statut"] ?>
+
+      <!-- FORM MODIFICATION THEME -->
+        <form method="post" action="">
+          <div class="form-group">
+            <label for="choix_modif_theme"><h4>Modifier un thème</h4></label>
+            <select class="form-control" id="choix_modif_theme" name="choix_modif_theme">
+              <option disabled selected value="">Choix du thème</option>
+              <?php foreach($themes as $theme): ?>
+                <option value="<?= $theme->id ?>"><?= $theme->nom ?></option>
+                <?php endforeach ?>
+            </select>
+          </div>
+          <div class="form-group">
+            <input class="form-control" id="nom_modif_theme" name="nom_modif_theme">
+          </div>
+          <div class="d-flex justify-content-center">
+          <button type="submit" name="form_modif_theme" class="btn btn-primary mr-2">Modifier</button>
+          <button type="submit" name="form_supp_theme" class="btn btn-danger ml-2">Supprimer</button>
+          </div>
+          <div class="alert alert-warning mt-2" role="alert">
+          Attention ! Supprimer un thème effacera aussi toutes les questions/réponses associées
+          </div>
+          <!-- <small class="form-text text-muted text-danger">
+            Attention ! Supprimer un thème effacera aussi toutes les questions/réponses qui lui sont associées
+          </small> -->
+        </form>
+
+        <hr class="my-4">
+
+        <!-- FORM MODIFICATION QUESTION -->
+        <form method="post" action="">
+          <div class="form-group">
+            <label for="choix_modif_question"><h4>Modifier une question</h4></label>
+            <select class="form-control" name="choix_modif_question" id="choix_modif_question">
+              <option selected disabled>Choix de la question</option>
+              <?php foreach($themes as $theme): ?>
+                  <option disabled value="">---------<?= $theme->nom ?>---------</option>
+                  <?php $questions = select_questions($theme->id); ?>
+                  <?php foreach ($questions as $question): ?>
+                  <option value="<?= $question->id ?>"><?= $question->contenu ?></option>
+                  <?php endforeach ?>
+              <?php endforeach ?>
+            </select>
+          </div>
+          <div class="form-group">
+            <input class="form-control" name="nom_modif_question">
+          </div>
+          <div class="d-flex justify-content-center">
+          <button type="submit" name="form_modif_question" class="btn btn-primary mr-2">Modifier</button>
+          <button type="submit" name="form_supp_question" class="btn btn-danger ml-2">Supprimer</button>
+          </div>
+          <div class="alert alert-warning mt-2" role="alert">
+          Attention ! Supprimer une question supprimera aussi toutes les réponses associées
+          </div>
+        </form>
+
+        <hr class="my-4">
+
+        
+        <form method="post" action="">
+          <div class="form-group">
+            <label for="choix_modif_rep"><h4>Modifier une réponse</h4></label>
+            <select class="form-control" name="choix_modif_rep">
+              <option disabled selected value="">Choix de la question</option>
+              <?php foreach($questions as $question): ?>
+                <option disabled value="">------<?= $question->contenu ?>------</option>
+                <?php $reponses = select_reponses($question->id); ?>
+                <?php foreach($reponses as $reponse): ?>
+                  <option value="<?= $reponse->id ?>"><?= $reponse->contenu ?></option>
+                <?php endforeach ?>
+              <?php endforeach ?>
+            </select>
+          </div>
+          <div class="form-group">
+            <input class="form-control" name="nom_modif_rep">
+          </div>
+          <div class="d-flex justify-content-center">
+            <button type="submit" name="form_modif_rep" class="btn btn-primary mr-2">Modifier</button>
+            <button type="submit" name="form_supp_rep" class="btn btn-danger ml-2">Supprimer</button>
+          </div>
+        </form>
+        
       </div>
     </div>
   </div>
