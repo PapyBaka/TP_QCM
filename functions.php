@@ -73,7 +73,7 @@ function ajout_theme($nom,$pdo)
 
 function ajout_question($nom_question,$choix_theme,$reponses,$pdo)
 {
-    $nom_question = ucfirst(strtolower(trim(htmlspecialchars($nom_question))));
+    $nom_question = ucfirst(trim(htmlspecialchars($nom_question)));
     if (empty($nom_question)) {
         throw new Exception("La question doit avoir un contenu");
     }
@@ -219,6 +219,17 @@ function modif_reponse($id_reponse,$nouveau_nom,$pdo) {
 }
 
 function supp_reponse($id_reponse,$pdo) {
+    $requete = $pdo->prepare("SELECT vrai_rep,id_question FROM reponses WHERE id = :id_reponse");
+    $requete->execute([
+        "id_reponse" => $id_reponse
+    ]);
+    $reponse = $requete->fetch(PDO::FETCH_ASSOC);
+    if ($reponse["vrai_rep"] == 1) {
+        $requete = $pdo->prepare("UPDATE questions SET nb_vrai_rep = nb_vrai_rep - 1 WHERE id = :id_question");
+        $requete->execute([
+            "id_question" => $reponse["id_question"]
+        ]);
+    }
     $requete = $pdo->prepare("DELETE FROM reponses WHERE id = :id_reponse");
     $requete->execute([
         "id_reponse" => $id_reponse
