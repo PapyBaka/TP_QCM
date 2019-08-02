@@ -15,11 +15,8 @@ require "elements/header.php";
 <h1 class="display-4 text-center"><?= "QCM - " . select_theme($_SESSION["theme"])->nom ?></h1>
 <hr class="my-4">
 <?php if(!empty($_POST["reponses"])): ?>
-<?php $score = calculScore($_POST["reponses"],$questions); ?>
-<pre>
-<?php var_dump($score); ?>
-</pre>
-<div class="alert alert-success">Votre score est de <?= $score["points"] ?> sur <?= $score["scoreMax"] ?></div>
+<?php $resultats = calculScore($_POST["reponses"],$questions); ?>
+<div class="alert alert-success">Votre score est de <?= $resultats["points"] ?> sur <?= $resultats["scoreMax"] ?></div>
 <?php endif ?>
 <form action="jeu.php" method="post">
 <?php foreach($questions as $question): ?>
@@ -30,8 +27,22 @@ require "elements/header.php";
         </div>
         <div class="card-body">
             <?php foreach($reponses as $k => $reponse): ?>
-            <div class="custom-control custom-checkbox py-1">
-                <input type="checkbox" name="reponses[]" value="<?= $reponse->vrai_rep ?>" class="custom-control-input" id="<?= $reponse->id ?>">
+                <?php if (!empty($_POST["reponses"])): ?>
+                    <?php foreach($_POST["reponses"] as $idReponseUser): ?>
+                        <?php if ($reponse->id == $idReponseUser): ?>
+                            <?php if ($reponse->vrai_rep == 1): ?>
+                                <p class="text-success">BONNE REPONSE</p>
+                            <?php elseif ($reponse->vrai_rep == 0): ?>
+                                <p class="text-danger">MAUVAISE REPONSE</p>
+                            <?php endif ?>
+                        <?php endif ?>
+                    <?php endforeach ?>
+                    <?php if ($reponse->vrai_rep == 1 && !in_array($reponse->id,$_POST["reponses"])): ?>
+                        CETTE REPONSE DEVAIT ETRE COCHEE
+                    <?php endif ?>
+                <?php endif ?>
+                <div class="custom-control custom-checkbox py-1">
+                <input type="checkbox" name="reponses[]" value="<?= $reponse->id ?>" class="custom-control-input" id="<?= $reponse->id ?>">
                 <label class="custom-control-label" for="<?= $reponse->id ?>"><?= $reponse->contenu ?></label>
             </div>
             <?php if ($k != array_key_last($reponses)): ?>
@@ -48,6 +59,7 @@ require "elements/header.php";
 
 <?php
 echo "<pre>";
-var_dump($_POST["reponses"]);
+var_dump($_POST);
 var_dump($reponses);
+var_dump($resultats);
 echo "</pre>";

@@ -120,7 +120,7 @@ if (isset($_POST)) {
             <label for="ajout_theme">
               <h4>Ajouter un thème</h4>
             </label>
-            <input type="text" class="form-control <?= isset($error_theme) ? 'is-invalid' : '' ?>" id="ajout_theme" name="ajout_theme" placeholder="Nom du thème">
+            <input type="text" class="form-control" id="ajout_theme" name="ajout_theme" placeholder="Nom du thème">
           </div>
           <button type="submit" name="form_ajout_theme" class="btn btn-primary">Ajouter</button>
         </form>
@@ -138,13 +138,13 @@ if (isset($_POST)) {
               <option selected disabled>Choix du thème</option>
               <?php $themes = select_themes("choix_theme", $pdo); ?>
               <?php foreach ($themes as $theme) : ?>
-                <option <?= isset($_POST["choix_theme"]) && $_POST["choix_theme"] == $theme->id ? "selected" : "" ?> value="<?= $theme->id ?>"><?= $theme->nom ?></option>
+                <option <?= isset($_POST["choix_theme"]) && $_POST["choix_theme"] == $theme->id && isset($error) ? "selected" : "" ?> value="<?= $theme->id ?>"><?= $theme->nom ?></option>
               <?php endforeach ?>
             </select>
           </div>
 
           <div class="form-group">
-            <input class="form-control" id="ajout_question" name="ajout_question" value="<?= !empty($_POST["ajout_question"]) ? $_POST["ajout_question"] : '' ?>" placeholder="Contenu de la question">
+            <input class="form-control" id="ajout_question" name="ajout_question" value="<?= !empty($_POST["ajout_question"]) && isset($error) ? $_POST["ajout_question"] : '' ?>" placeholder="Contenu de la question">
           </div>
 
           <!-- REPONSE 1 -->
@@ -161,7 +161,7 @@ if (isset($_POST)) {
                   <input type="checkbox" name="rep1" value="1">
                 </div>
               </div>
-              <input class="form-control" id="ajout_reponse" name="ajout_reponse[]" value="<?= !empty($_POST["ajout_reponse"][0]) ? $_POST["ajout_reponse"][0] : '' ?>" placeholder="Reponse 1">
+              <input class="form-control" id="ajout_reponse" name="ajout_reponse[]" value="<?= !empty($_POST["ajout_reponse"][0]) && isset($error) ? $_POST["ajout_reponse"][0] : '' ?>" placeholder="Reponse 1">
             </div>
           </div>
 
@@ -173,7 +173,7 @@ if (isset($_POST)) {
                   <input type="checkbox" name="rep2" value="1">
                 </div>
               </div>
-              <input class="form-control" id="ajout_reponse" name="ajout_reponse[]" value="<?= !empty($_POST["ajout_reponse"][1]) ? $_POST["ajout_reponse"][1] : '' ?>" placeholder="Reponse 2">
+              <input class="form-control" id="ajout_reponse" name="ajout_reponse[]" value="<?= !empty($_POST["ajout_reponse"][1]) && isset($error) ? $_POST["ajout_reponse"][1] : '' ?>" placeholder="Reponse 2">
             </div>
           </div>
 
@@ -185,7 +185,7 @@ if (isset($_POST)) {
                   <input type="checkbox" name="rep3" value="1">
                 </div>
               </div>
-              <input class="form-control" id="ajout_reponse" name="ajout_reponse[]" value="<?= !empty($_POST["ajout_reponse"][2]) ? $_POST["ajout_reponse"][2] : '' ?>" placeholder="Reponse 3">
+              <input class="form-control" id="ajout_reponse" name="ajout_reponse[]" value="<?= !empty($_POST["ajout_reponse"][2]) && isset($error) ? $_POST["ajout_reponse"][2] : '' ?>" placeholder="Reponse 3">
             </div>
           </div>
           <button type="submit" name="form_ajout_question" class="btn btn-primary">Ajouter</button>
@@ -206,7 +206,7 @@ if (isset($_POST)) {
                 <option disabled value="<?= $theme->id ?>">---------<?= $theme->nom ?>---------</option>
                 <?php $questions = select_questions($theme->id); ?>
                 <?php foreach ($questions as $question) : ?>
-                  <option <?= isset($_POST["choix_question"]) && $_POST["choix_question"] == $question->id ? "selected" : "" ?> value="<?= $question->id ?>"><?= $question->contenu ?></option>
+                  <option <?= isset($_POST["choix_question"]) && $_POST["choix_question"] == $question->id && isset($error) ? "selected" : "" ?> value="<?= $question->id ?>"><?= $question->contenu ?></option>
                 <?php endforeach ?>
               <?php endforeach ?>
             </select>
@@ -218,7 +218,7 @@ if (isset($_POST)) {
                   <input type="checkbox" name="bonne_rep_supp" value="1">
                 </div>
               </div>
-              <input type="text" class="form-control" id="ajout_rep_supp" name="ajout_rep_supp" value="<?= !empty($_POST["ajout_rep_supp"]) ? $_POST["ajout_rep_supp"] : '' ?>" placeholder="Contenu de la réponse">
+              <input type="text" class="form-control" id="ajout_rep_supp" name="ajout_rep_supp" value="<?= !empty($_POST["ajout_rep_supp"]) && isset($error) ? $_POST["ajout_rep_supp"] : '' ?>" placeholder="Contenu de la réponse">
             </div>
             <small class="form-text text-muted" id="help">
               Cochez la case s'il s'agit d'une bonne réponse
@@ -245,12 +245,12 @@ if (isset($_POST)) {
             <select class="form-control" id="choix_modif_theme" name="choix_modif_theme">
               <option disabled selected value="">Choix du thème</option>
               <?php foreach ($themes as $theme) : ?>
-                <option <?= isset($_POST["choix_modif_theme"]) && $_POST["choix_modif_theme"] == $theme->id ? "selected" : "" ?> value="<?= $theme->id ?>"><?= $theme->nom ?></option>
+                <option <?= isset($_POST["choix_modif_theme"]) && $_POST["choix_modif_theme"] == $theme->id && isset($error) ? "selected" : "" ?> value="<?= $theme->id ?>"><?= $theme->nom ?></option>
               <?php endforeach ?>
             </select>
           </div>
           <div class="form-group">
-            <input class="form-control" id="nom_modif_theme" name="nom_modif_theme" value="<?= !empty($_POST["nom_modif_theme"]) ? $_POST["nom_modif_theme"] : '' ?>" placeholder="Nouveau nom du thème">
+            <input class="form-control" id="nom_modif_theme" name="nom_modif_theme" value="<?= !empty($_POST["nom_modif_theme"]) && isset($error) ? $_POST["nom_modif_theme"] : '' ?>" placeholder="Nouveau nom du thème">
           </div>
           <div class="d-flex justify-content-center">
             <button type="submit" name="form_modif_theme" class="btn btn-primary mr-2">Modifier</button>
@@ -275,13 +275,13 @@ if (isset($_POST)) {
                 <option disabled value="">---------<?= $theme->nom ?>---------</option>
                 <?php $questions = select_questions($theme->id); ?>
                 <?php foreach ($questions as $question) : ?>
-                  <option <?= isset($_POST["choix_modif_question"]) && $_POST["choix_modif_question"] == $question->id ? "selected" : "" ?> value="<?= $question->id ?>"><?= $question->contenu ?></option>
+                  <option <?= isset($_POST["choix_modif_question"]) && $_POST["choix_modif_question"] == $question->id && isset($error) ? "selected" : "" ?> value="<?= $question->id ?>"><?= $question->contenu ?></option>
                 <?php endforeach ?>
               <?php endforeach ?>
             </select>
           </div>
           <div class="form-group">
-            <input class="form-control" name="nom_modif_question" value="<?= !empty($_POST["nom_modif_question"]) ? $_POST["nom_modif_question"] : '' ?>" placeholder="Nouveau contenu de la question">
+            <input class="form-control" name="nom_modif_question" value="<?= isset($_POST['nom_modif_question']) && isset($error) ? $_POST['nom_modif_question'] : '' ?>" placeholder="Nouveau contenu de la question">
           </div>
           <div class="d-flex justify-content-center">
             <button type="submit" name="form_modif_question" class="btn btn-primary mr-2">Modifier</button>
@@ -306,13 +306,13 @@ if (isset($_POST)) {
                 <option disabled value="">------<?= $question->contenu ?>------</option>
                 <?php $reponses = select_reponses($question->id); ?>
                 <?php foreach ($reponses as $reponse) : ?>
-                  <option <?= isset($_POST["choix_modif_rep"]) && $_POST["choix_modif_rep"] == $reponse->id ? "selected" : "" ?> value="<?= $reponse->id ?>"><?= $reponse->contenu ?></option>
+                  <option <?= isset($_POST["choix_modif_rep"]) && $_POST["choix_modif_rep"] == $reponse->id && isset($error) ? "selected" : "" ?> value="<?= $reponse->id ?>"><?= $reponse->contenu ?></option>
                 <?php endforeach ?>
               <?php endforeach ?>
             </select>
           </div>
           <div class="form-group">
-            <input class="form-control" name="nom_modif_rep" value="<?= !empty($_POST["nom_modif_rep"]) ? $_POST["nom_modif_rep"] : '' ?>" placeholder="Nouveau contenu de la réponse">
+            <input class="form-control" name="nom_modif_rep" value="<?= !empty($_POST["nom_modif_rep"]) && isset($error) ? $_POST["nom_modif_rep"] : '' ?>" placeholder="Nouveau contenu de la réponse">
           </div>
           <div class="d-flex justify-content-center">
             <button type="submit" name="form_modif_rep" class="btn btn-primary mr-2">Modifier</button>

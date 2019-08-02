@@ -237,26 +237,18 @@ function supp_reponse($id_reponse,$pdo) {
     return true;
 }
 
-function calculScore($reponsesUser,$questions)
+function calculScore($reponses,$questions)
 {
-    //CALCUL SCORE MAXIMUM
     $pdo = new PDO("mysql:host=localhost;dbname=qcm;charset=utf8","root","");
-    $reponsesBdd = null;
+    
     $scoreMax = 0;
     foreach ($questions as $question) {
-        /* $requete = $pdo->prepare("SELECT nb_vrai_rep FROM questions WHERE id_question = :id_question");
-        $requete->execute([
-            "id_question" => $question->id
-        ]);
-        $reponsesBdd[] = $requete->fetchAll(PDO::FETCH_OBJ); */
         $scoreMax += $question->nb_vrai_rep;
     }
     // CALCUL TOTAL
-    $points = 0;
-    foreach($reponsesUser as $reponse) {
-        if ($reponse == 1) {
-            $points += 1;
-        } else {
+    $points = $scoreMax;
+    foreach($reponses as $reponse) {
+        if ($reponse == 0) {
             $points -= 1;
         }
     }
