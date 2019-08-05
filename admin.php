@@ -306,13 +306,23 @@ if (isset($_POST)) {
                 <option disabled value="">------<?= $question->contenu ?>------</option>
                 <?php $reponses = select_reponses($question->id); ?>
                 <?php foreach ($reponses as $reponse) : ?>
-                  <option <?= isset($_POST["choix_modif_rep"]) && $_POST["choix_modif_rep"] == $reponse->id && isset($error) ? "selected" : "" ?> value="<?= $reponse->id ?>"><?= $reponse->contenu ?></option>
+                  <option <?= $reponse->vrai_rep == 1 ? "style='background-color:#8ae888'" : "" ?><?= isset($_POST["choix_modif_rep"]) && $_POST["choix_modif_rep"] == $reponse->id && isset($error) ? "selected" : "" ?> value="<?= $reponse->id ?>"><?= $reponse->contenu ?></option>
                 <?php endforeach ?>
               <?php endforeach ?>
             </select>
           </div>
           <div class="form-group">
-            <input class="form-control" name="nom_modif_rep" value="<?= !empty($_POST["nom_modif_rep"]) && isset($error) ? $_POST["nom_modif_rep"] : '' ?>" placeholder="Nouveau contenu de la réponse">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  <input type="checkbox" name="bonne_rep_supp" value="1">
+                </div>
+              </div>
+              <input class="form-control" name="nom_modif_rep" value="<?= !empty($_POST["nom_modif_rep"]) && isset($error) ? $_POST["nom_modif_rep"] : '' ?>" placeholder="Nouveau contenu de la réponse">
+            </div>
+            <small class="form-text text-muted" id="help">
+              Cochez ou décochez la case pour modifier l'indicateur de bonne réponse
+            </small>
           </div>
           <div class="d-flex justify-content-center">
             <button type="submit" name="form_modif_rep" class="btn btn-primary mr-2">Modifier</button>

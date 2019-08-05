@@ -23,7 +23,7 @@ require "elements/header.php";
               <?php endforeach ?>
             </select>
           </div>
-          <button class="btn btn-primary" type="submit" name="0">C'est parti !</button>
+          <button class="btn btn-primary" type="submit">C'est parti !</button>
         </form>
       </div>
     </div>
@@ -33,7 +33,7 @@ require "elements/header.php";
         <h3>Résultats</h3>
       </div>
       <div class="card-body">
-        Statut: <?= $_SESSION["statut"] ?>
+        <?php afficherResultats() ?>
       </div>
     </div>
   </div>

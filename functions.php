@@ -224,7 +224,17 @@ function supp_reponse($id_reponse,$pdo) {
         "id_reponse" => $id_reponse
     ]);
     $reponse = $requete->fetch(PDO::FETCH_ASSOC);
+    // ON VERIFIE QU'IL RESTE AU MOINS UNE BONNE REPONSE
+    $requete = $pdo->prepare("SELECT nb_vrai_rep FROM questions WHERE id = :id_question");
+    $requete->execute([
+        "id_question" => $reponse["id_question"]
+    ]);
+    $question = $requete->fetch(PDO::FETCH_OBJ);
+    
     if ($reponse["vrai_rep"] == 1) {
+        if ($question->nb_vrai_rep <= 1) {
+            throw new Exception("Il doit forcément rester une bonne réponse. Vous pouvez créer une autre bonne réponse et supprimer celle-ci.");
+        }
         $requete = $pdo->prepare("UPDATE questions SET nb_vrai_rep = nb_vrai_rep - 1 WHERE id = :id_question");
         $requete->execute([
             "id_question" => $reponse["id_question"]
@@ -237,23 +247,46 @@ function supp_reponse($id_reponse,$pdo) {
     return true;
 }
 
-function calculScore($reponses,$questions)
+function calculScore($reponsesUser,$questions)
 {
     $pdo = new PDO("mysql:host=localhost;dbname=qcm;charset=utf8","root","");
-    
-    $scoreMax = 0;
-    foreach ($questions as $question) {
-        $scoreMax += $question->nb_vrai_rep;
-    }
-    // CALCUL TOTAL
-    $points = $scoreMax;
-    foreach($reponses as $reponse) {
-        if ($reponse == 0) {
-            $points -= 1;
+    $score = 0;
+    $scoreMax = count($questions);
+
+    //CALCUL NOMBRE BONNES REPONSES
+    foreach($questions as $question) {
+        $reponsesBdd = select_reponses($question->id);
+        $nb_vrai_rep_user = 0;
+        foreach ($reponsesUser as $reponseUser) {
+            foreach($reponsesBdd as $reponseBdd) {
+                if ($reponseUser == $reponseBdd->id) {
+                    if ($reponseBdd->vrai_rep == 1) {
+                        $nb_vrai_rep_user++;
+                    } elseif ($reponseBdd->vrai_rep == 0) {
+                        $nb_vrai_rep_user--;
+                    }
+                }
+            }
+        }
+        if ($nb_vrai_rep_user == $question->nb_vrai_rep) {
+            $score++;
         }
     }
-    if ($points < 0) {
-        $points = 0;
-    }
-    return ["points" => $points, "scoreMax" => $scoreMax];
+    $multiple = 20 / $scoreMax;
+    $note_sur_20 = round($score * $multiple,1);
+    return ["score" => $score, "scoreMax" => $scoreMax, "note_sur_20" => $note_sur_20];
+}
+
+function insererResultat($note_sur_20) {
+    $pdo = new PDO("mysql:host=localhost;dbname=qcm;charset=utf8","root","");
+    $requete = $pdo->prepare("INSERT INTO resultats(score,id_personne) VALUES (:score,:id_personne)");
+    $requete->execute([
+        "score" => $note_sur_20,
+        "id_personne" => $_SESSION["id"]
+    ]);
+}
+
+function afficherResultats() {
+    $pdo = new PDO("mysql:host=localhost;dbname=qcm;charset=utf8","root","");
+    $requete = $pdo->prepare("SELECT ");
 }
