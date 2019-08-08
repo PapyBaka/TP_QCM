@@ -10,11 +10,14 @@ if (isset($_POST["theme"])) {
 if (!isset($_POST["theme"]) && (isset($_SESSION["theme"]) && empty($_POST["reponses"]))) {
     $error = "Il faut sélectionner au moins une réponse.";
 }
+if (!isset($_SESSION["theme"])) {
+    header("Location:index.php");
+}
 ?>
 
 
 
-<div class="container">
+<div class="container mb-4">
 <?php $questions = select_questions($_SESSION["theme"]);?>
 <h1 class="display-4 text-center"><?="QCM - " . select_theme($_SESSION["theme"])->nom?></h1>
 <hr class="my-4">
@@ -25,11 +28,13 @@ if (!isset($_POST["theme"]) && (isset($_SESSION["theme"]) && empty($_POST["repon
 <?php endif?>
 <?php if (!empty($_POST["reponses"])): ?>
     <?php $resultats = calculScore($_POST["reponses"], $questions);?>
+    <?php insererResultat($resultats["note_sur_20"]) ?>
+    <?php unset($_SESSION["theme"]); ?>
     <div class="alert alert-info w-50 m-auto text-center font-weight-bold">
         Votre score est de <?=$resultats["score"]?> sur <?=$resultats["scoreMax"]?>, soit une note de <?=$resultats["note_sur_20"] ?>/20<br>
         <a href="index.php">Retourner à l'accueil</a>
     </div>
-    <?php insererResultat($resultats["note_sur_20"]) ?>
+    
 <?php endif?>
 <?php if (empty($_POST["reponses"])): ?>
 <form action="jeu.php" method="post">
@@ -77,14 +82,9 @@ if (!isset($_POST["theme"]) && (isset($_SESSION["theme"]) && empty($_POST["repon
 
 <?php endforeach ?>
 <?php if (empty($_POST["reponses"])): ?>
-<button class="btn btn-success btn-lg btn-block w-auto m-auto px-5" type="submit">Valider</button>
+<button class="btn btn-success btn-lg btn-block w-auto mx-auto px-5" type="submit">Valider</button>
 </form>
 <?php endif ?>
 </div>
 
 <?php
-echo "<pre>";
-var_dump($_POST);
-var_dump($reponses);
-var_dump($resultats);
-echo "</pre>";

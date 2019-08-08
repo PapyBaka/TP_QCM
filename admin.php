@@ -2,9 +2,6 @@
 require "elements/header.php";
 $error = null;
 $success = null;
-echo "<pre>";
-var_dump($_POST);
-echo "</pre>";
 // VERIF DONNEES POST
 if (isset($_POST)) {
   try {

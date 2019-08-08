@@ -152,10 +152,12 @@ function ajout_rep_supp($choix_question,$reponse,$bonne_reponse,$pdo)
     "id_question" => $choix_question,
     "bonne_rep" => $bonne_reponse == "1" ? "1" : "0"
     ]);
-    $requete = $pdo->prepare("UPDATE questions SET nb_vrai_rep = nb_vrai_rep + 1 WHERE id = :id_question");
-    $requete->execute([
-        "id_question" => $choix_question
-    ]);
+    if ($bonne_reponse == "1") {
+        $requete = $pdo->prepare("UPDATE questions SET nb_vrai_rep = nb_vrai_rep + 1 WHERE id = :id_question");
+        $requete->execute([
+            "id_question" => $choix_question
+        ]);
+    }
     return true;
 }
 
@@ -278,15 +280,32 @@ function calculScore($reponsesUser,$questions)
 }
 
 function insererResultat($note_sur_20) {
-    $pdo = new PDO("mysql:host=localhost;dbname=qcm;charset=utf8","root","");
-    $requete = $pdo->prepare("INSERT INTO resultats(score,id_personne) VALUES (:score,:id_personne)");
-    $requete->execute([
-        "score" => $note_sur_20,
-        "id_personne" => $_SESSION["id"]
-    ]);
+    try {
+        $pdo = new PDO("mysql:host=localhost;dbname=qcm;charset=utf8","root","");
+        $requete = $pdo->prepare("INSERT INTO resultats(score,id_personne,date_creation,id_theme) VALUES (:score,:id_personne,:date_creation,:id_theme)");
+        $requete->execute([
+            "score" => $note_sur_20,
+            "id_personne" => $_SESSION["id"],
+            "date_creation" => date("Y-m-d"),
+            "id_theme" => $_SESSION["theme"]
+        ]);
+        return true;
+    } catch (Exception $e) {
+        return $e->getMessage();
+    }
+    
 }
 
-function afficherResultats() {
+function selectResultats() {
     $pdo = new PDO("mysql:host=localhost;dbname=qcm;charset=utf8","root","");
-    $requete = $pdo->prepare("SELECT ");
+    $requete = $pdo->prepare("SELECT resultats.id,score,date_creation,nom FROM resultats INNER JOIN themes ON resultats.id_theme = themes.id WHERE resultats.id_personne = :id_personne");
+    $requete->execute([
+        "id_personne" => $_SESSION["id"]
+    ]);
+    $resultats = $requete->fetchAll(PDO::FETCH_OBJ);
+    foreach ($resultats as $resultat) {
+        $date = new DateTime($resultat->date_creation);
+        $resultat->date_creation = $date->format("d/m/Y");
+    }
+    return $resultats;
 }

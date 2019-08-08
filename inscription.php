@@ -4,7 +4,7 @@ $error = null;
 $succes = null;
 if (isset($_POST["email"]) && isset($_POST["mdp"]) && isset($_POST["prenom"]) && isset($_POST["nom"])) {
 
-    if (trim(strlen($_POST["mdp"]) < 6)) {
+    if (trim(strlen($_POST["mdp"]) < 6) || trim(strlen($_POST["mdp"]) > 15)) {
         $error["mdp"] = "Mot de passe trop court";
     }
     if (!filter_var($_POST["email"],FILTER_VALIDATE_EMAIL)) {
@@ -16,9 +16,23 @@ if (isset($_POST["email"]) && isset($_POST["mdp"]) && isset($_POST["prenom"]) &&
     if (preg_match("/([^A-Za-z])/",$_POST["nom"]) === 1) {
         $error["nom"] = "Votre nom n'est probablement composé que de lettres de l'alphabet";
     }
+    if (empty($_POST["prenom"])) {
+        $error["prenom"] = "Vous devez entrer un prénom";
+    }
+    if (empty($_POST["nom"])) {
+        $error["nom"] = "Vous devez entrer un nom";
+    }
     if (empty($error)) {
         try {
             $pdo = new PDO("mysql:host=localhost;dbname=qcm","root","");
+            $requete = $pdo->prepare("SELECT mail FROM personnes WHERE mail = :mail");
+            $requete->execute([
+                "mail" => $_POST["email"]
+            ]);
+            $mailExistant = $requete->rowCount();
+            if ($mailExistant != 0) {
+                throw new Exception("Mail déjà associé à un compte");
+            }
             $requete = 'INSERT INTO personnes (prenom, nom, mail, mot_de_passe) VALUES (:prenom, :nom, :mail, :motdepasse)';
             $query = $pdo->prepare($requete);
             $query->execute([
@@ -43,15 +57,15 @@ if (isset($_POST["email"]) && isset($_POST["mdp"]) && isset($_POST["prenom"]) &&
         <?= $succes ?>
     </div>
     <?php endif ?>
-    <?php if (isset($error["exception"])): ?>
+    <?php if (isset($error["pdo"])): ?>
     <div class="alert alert-danger">
-        <?= $error["exception"] ?>
+        <?= $error["pdo"] ?>
     </div>
     <?php endif ?>
 <form class="form" method="post" action="">
     <div class="form-group">
       <label for="prenom">Prénom</label>
-      <input required type="text" class="form-control <?= isset($error["prenom"]) ? 'is-invalid' : '' ?>" name="prenom" id="prenom" value="<?= !empty($error) ? htmlentities($_POST["prenom"]) : '' ?>">
+      <input type="text" class="form-control <?= isset($error["prenom"]) ? 'is-invalid' : '' ?>" name="prenom" id="prenom" value="<?= !empty($error) ? htmlentities($_POST["prenom"]) : '' ?>">
       <?php if (isset($error["prenom"])): ?>
       <div class="invalid-feedback">
           <?= $error["prenom"]; ?>
@@ -60,7 +74,7 @@ if (isset($_POST["email"]) && isset($_POST["mdp"]) && isset($_POST["prenom"]) &&
     </div>
     <div class="form-group">
       <label for="nom">Nom</label>
-      <input required type="text" class="form-control <?= isset($error["nom"]) ? 'is-invalid' : '' ?>" name="nom" id="nom" value="<?= !empty($error) ? htmlentities($_POST["nom"]) : '' ?>">
+      <input type="text" class="form-control <?= isset($error["nom"]) ? 'is-invalid' : '' ?>" name="nom" id="nom" value="<?= !empty($error) ? htmlentities($_POST["nom"]) : '' ?>">
       <?php if (isset($error["nom"])): ?>
       <div class="invalid-feedback">
           <?= $error["nom"]; ?>
@@ -69,7 +83,7 @@ if (isset($_POST["email"]) && isset($_POST["mdp"]) && isset($_POST["prenom"]) &&
     </div>
     <div class="form-group">
       <label for="email">Adresse email</label>
-      <input required type="email" class="form-control <?= isset($error["email"]) ? 'is-invalid' : '' ?>" name="email" id="email" value="<?= !empty($error) ? htmlentities($_POST["email"]) : '' ?>">
+      <input type="email" class="form-control <?= isset($error["email"]) ? 'is-invalid' : '' ?>" name="email" id="email" value="<?= !empty($error) ? htmlentities($_POST["email"]) : '' ?>">
       <?php if (isset($error["email"])): ?>
       <div class="invalid-feedback">
           <?= $error["email"]; ?>
@@ -78,7 +92,7 @@ if (isset($_POST["email"]) && isset($_POST["mdp"]) && isset($_POST["prenom"]) &&
     </div>
     <div class="form-group">
       <label for="mdp">Mot de passe</label>
-      <input required type="password" class="form-control <?= isset($error["mdp"]) ? 'is-invalid' : '' ?>" name="mdp" id="mdp" value="<?= !empty($error) ? htmlentities($_POST["mdp"]) : '' ?>">
+      <input type="password" class="form-control <?= isset($error["mdp"]) ? 'is-invalid' : '' ?>" name="mdp" id="mdp" value="<?= !empty($error) ? htmlentities($_POST["mdp"]) : '' ?>">
       <?php if (isset($error["mdp"])): ?>
       <div class="invalid-feedback">
           <?= $error["mdp"]; ?>
